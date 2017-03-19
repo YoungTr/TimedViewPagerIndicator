@@ -3,7 +3,16 @@
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
+/.idea/misc.xml
+/.idea/qaplug_profiles.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
+._*
+.idea/vcs.xml
+app/libs/
+app/src/main/res/drawable/
+library/libs/
+library/src/main/java/
+library/src/main/res/drawable/
