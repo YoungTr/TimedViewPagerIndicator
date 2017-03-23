@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="default_line_width">8dp</dimen>
+    <dimen name="default_line_width">20dp</dimen>
     <dimen name="default_line_height">2dp</dimen>
     <dimen name="default_gap_width">2dp</dimen>
 </resources>
