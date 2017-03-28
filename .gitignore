@@ -11,8 +11,3 @@
 .externalNativeBuild
 ._*
 .idea/vcs.xml
-app/libs/
-app/src/main/res/drawable/
-library/libs/
-library/src/main/java/
-library/src/main/res/drawable/
