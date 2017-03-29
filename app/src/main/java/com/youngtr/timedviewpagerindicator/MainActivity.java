@@ -1,10 +1,12 @@
 package com.youngtr.timedviewpagerindicator;
 
 import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private TimedViewPagerIndicator mIndicator;
 
+    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +28,13 @@ public class MainActivity extends AppCompatActivity {
         mIndicator = (TimedViewPagerIndicator) findViewById(R.id.indicator);
         mViewPager.setAdapter(new IndicatorPagerAdapter());
         mIndicator.setViewPager(mViewPager);
+        mIndicator.startScroll();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mIndicator.stopScroll();
     }
 
     class IndicatorPagerAdapter extends PagerAdapter {

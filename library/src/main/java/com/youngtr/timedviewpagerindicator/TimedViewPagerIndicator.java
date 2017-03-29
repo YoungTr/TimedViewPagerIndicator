@@ -1,11 +1,17 @@
 package com.youngtr.timedviewpagerindicator;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
@@ -14,7 +20,14 @@ import android.view.View;
  * Created by YoungTr on 17/3/19.
  */
 
-public class TimedViewPagerIndicator extends View implements PageIndicator {
+public class TimedViewPagerIndicator extends View implements PageIndicator, Animator.AnimatorListener {
+
+    private static final float SELECTED_PERCENT_START = 0.0F;
+    private static final float SELECTED_PERCENT_END = 1.0F;
+
+    private static final long ANIMATOR_DEFAULT_DURATION = 3000L;
+
+    private static final String ANIMATOR_PROPERTY = "selectedPercent";
 
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mPageChangeListener;
@@ -22,10 +35,15 @@ public class TimedViewPagerIndicator extends View implements PageIndicator {
     private final Paint mSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mUnSelectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    private ObjectAnimator mScrollAnimator;
+
     private float mLineWidth;
     private float mGapWidth;
+    private float mSelectedPercent;
 
     private int mCurrentPage;
+
+    private long mAnimatorDuration = ANIMATOR_DEFAULT_DURATION;
 
     public TimedViewPagerIndicator(Context context) {
         this(context, null);
@@ -91,8 +109,12 @@ public class TimedViewPagerIndicator extends View implements PageIndicator {
         for (int i = 0; i < count; i++) {
             float startX = horizontalOffset + lineAndGapWidth * i;
             float endX = startX + getLineWidth();
-            canvas.drawLine(startX, verticalOffset, endX, verticalOffset, (i == mCurrentPage) ? mSelectedPaint : mUnSelectedPaint);
+            canvas.drawLine(startX, verticalOffset, endX, verticalOffset, mUnSelectedPaint);
         }
+
+        float selectedStartX = horizontalOffset + lineAndGapWidth * mCurrentPage;
+        float selectedEndX = selectedStartX + getLineWidth() * getSelectedPercent();
+        canvas.drawLine(selectedStartX, verticalOffset, selectedEndX, verticalOffset, mSelectedPaint);
 
     }
 
@@ -195,4 +217,82 @@ public class TimedViewPagerIndicator extends View implements PageIndicator {
         invalidate();
     }
 
+    public float getSelectedPercent() {
+        return mSelectedPercent;
+    }
+
+    public void setSelectedPercent(float selectedPercent) {
+        this.mSelectedPercent = selectedPercent;
+        invalidate();
+    }
+
+    private void viewPagerScrollOnce() {
+        PagerAdapter adapter = mViewPager.getAdapter();
+        final int count = adapter.getCount();
+        if (count <= 1) {
+            return;
+        }
+        int nextPage = mCurrentPage + 1;
+        if (nextPage == count) {
+            setCurrentItem(0);
+        } else {
+            setCurrentItem(nextPage);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public void startScroll() {
+
+        if (mViewPager == null) {
+            throw new IllegalStateException("ViewPager has not been bound.");
+        }
+        if (mScrollAnimator == null) {
+            mScrollAnimator = ObjectAnimator.ofFloat(this, ANIMATOR_PROPERTY, SELECTED_PERCENT_START, SELECTED_PERCENT_END);
+            mScrollAnimator.setDuration(getAnimatorDuration());
+            mScrollAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            mScrollAnimator.addListener(this);
+        }
+
+        if (!mScrollAnimator.isStarted()) {
+            mScrollAnimator.start();
+        }
+
+    }
+
+    public void stopScroll() {
+        if (mScrollAnimator != null) {
+            mScrollAnimator.cancel();
+        }
+    }
+
+    public long getAnimatorDuration() {
+        return mAnimatorDuration;
+    }
+
+    public void setScrollDuration(long animatorDuration) {
+        this.mAnimatorDuration = animatorDuration;
+        if (mScrollAnimator != null) {
+            mScrollAnimator.setDuration(animatorDuration);
+        }
+    }
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
+        viewPagerScrollOnce();
+    }
 }
