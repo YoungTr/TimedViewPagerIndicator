@@ -1,20 +1,21 @@
 package com.youngtr.timedviewpagerindicator;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.youngtr.timedviewpagerindicator.example.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int[] mImages = {R.mipmap.image1, R.mipmap.image2, R.mipmap.image3};
 
     private ViewPager mViewPager;
     private TimedViewPagerIndicator mIndicator;
@@ -37,11 +38,24 @@ public class MainActivity extends AppCompatActivity {
         mIndicator.stopScroll();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mIndicator.stopScroll();
+        }
+        if (action == MotionEvent.ACTION_UP) {
+            mIndicator.startScroll();
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     class IndicatorPagerAdapter extends PagerAdapter {
 
         @Override
         public int getCount() {
-            return Strings.values().length;
+            return mImages.length;
         }
 
         @Override
@@ -51,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            TextView textView = new TextView(getApplicationContext());
-            textView.setText(Strings.values()[position].getStr());
-            textView.setTextColor(Color.BLACK);
-            container.addView(textView);
-            return textView;
+            ImageView imageView = new ImageView(MainActivity.this);
+            imageView.setImageResource(mImages[position]);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            container.addView(imageView);
+            return imageView;
         }
 
         @Override

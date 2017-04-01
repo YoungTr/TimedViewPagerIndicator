@@ -70,6 +70,15 @@ public class TimedViewPagerIndicator extends View implements PageIndicator, Anim
         setLineHeight(attributes.getDimension(R.styleable.TimedViewPagerIndicator_lineHeight, defaultLineHeight));
         setGapWidth(attributes.getDimension(R.styleable.TimedViewPagerIndicator_gapWidth, defaultGapWidth));
         attributes.recycle();
+
+        initScrollAnimator();
+    }
+
+    private void initScrollAnimator() {
+        mScrollAnimator = ObjectAnimator.ofFloat(this, ANIMATOR_PROPERTY, SELECTED_PERCENT_START, SELECTED_PERCENT_END);
+        mScrollAnimator.setDuration(getScrollDuration());
+        mScrollAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        mScrollAnimator.addListener(this);
     }
 
     @Override
@@ -246,12 +255,6 @@ public class TimedViewPagerIndicator extends View implements PageIndicator, Anim
         if (mViewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
         }
-        if (mScrollAnimator == null) {
-            mScrollAnimator = ObjectAnimator.ofFloat(this, ANIMATOR_PROPERTY, SELECTED_PERCENT_START, SELECTED_PERCENT_END);
-            mScrollAnimator.setDuration(getAnimatorDuration());
-            mScrollAnimator.setRepeatCount(ValueAnimator.INFINITE);
-            mScrollAnimator.addListener(this);
-        }
 
         if (!mScrollAnimator.isStarted()) {
             mScrollAnimator.start();
@@ -259,13 +262,15 @@ public class TimedViewPagerIndicator extends View implements PageIndicator, Anim
 
     }
 
+
     public void stopScroll() {
         if (mScrollAnimator != null) {
+            setSelectedPercent(SELECTED_PERCENT_END);
             mScrollAnimator.cancel();
         }
     }
 
-    public long getAnimatorDuration() {
+    public long getScrollDuration() {
         return mAnimatorDuration;
     }
 
