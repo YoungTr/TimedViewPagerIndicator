@@ -1,5 +1,5 @@
-# TimedViewPagerIndicator
+# ViewPagerIndicator
 
 ## demo
 
-<img src="https://github.com/YoungTr/TimedViewPagerIndicator/blob/master/gif/demo.gif" width="50%" height="50%" />
+<img src="https://github.com/YoungTr/ViewPagerIndicator/blob/master/gif/demo.gif" width="50%" height="50%" />
